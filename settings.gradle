@@ -1,0 +1,5 @@
+
+rootProject.name="ApiCal"
+
+include("app")
+include("infra")

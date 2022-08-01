@@ -1,0 +1,114 @@
+plugins {
+    id("groovy") 
+    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("io.micronaut.application") version "3.4.1"
+    id("org.openrewrite.rewrite") version "5.12.0"
+    id("io.micronaut.aot") version "3.4.1"
+}
+
+version = "0.1"
+group = "za.co.imgn.apical"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    annotationProcessor("org.projectlombok:lombok")
+    annotationProcessor("io.micronaut.data:micronaut-data-processor")
+    annotationProcessor("io.micronaut.microstream:micronaut-microstream-annotations")
+    annotationProcessor("io.micronaut.openapi:micronaut-openapi")
+    annotationProcessor("io.micronaut.security:micronaut-security-annotations")
+    annotationProcessor("io.micronaut.spring:micronaut-spring-annotation")
+    implementation("io.micronaut:micronaut-jackson-databind")
+    implementation("io.micronaut:micronaut-management")
+    implementation("io.micronaut.aws:micronaut-aws-alexa-httpserver")
+    implementation("io.micronaut.aws:micronaut-aws-parameter-store")
+    implementation("io.micronaut.aws:micronaut-aws-sdk-v2")
+    implementation("io.micronaut.aws:micronaut-aws-secretsmanager")
+    implementation("io.micronaut.beanvalidation:micronaut-hibernate-validator")
+    implementation("io.micronaut.data:micronaut-data-hibernate-jpa")
+    implementation("io.micronaut.email:micronaut-email-sendgrid")
+    implementation("io.micronaut.email:micronaut-email-template")
+    implementation("io.micronaut.jms:micronaut-jms-sqs")
+    implementation("io.micronaut.micrometer:micronaut-micrometer-core")
+    implementation("io.micronaut.micrometer:micronaut-micrometer-registry-cloudwatch")
+    implementation("io.micronaut.microstream:micronaut-microstream")
+    implementation("io.micronaut.microstream:micronaut-microstream-annotations")
+    implementation("io.micronaut.multitenancy:micronaut-multitenancy")
+    implementation("io.micronaut.problem:micronaut-problem-json")
+    implementation("io.micronaut.reactor:micronaut-reactor")
+    implementation("io.micronaut.rss:micronaut-rss")
+    implementation("io.micronaut.security:micronaut-security")
+    implementation("io.micronaut.security:micronaut-security-oauth2")
+    implementation("io.micronaut.sql:micronaut-jdbc-hikari")
+    implementation("io.micronaut.views:micronaut-views-thymeleaf")
+    implementation("io.swagger.core.v3:swagger-annotations")
+    implementation("jakarta.annotation:jakarta.annotation-api")
+    implementation("org.springframework.boot:spring-boot-starter")
+    implementation("software.amazon.awssdk:dynamodb") {
+      exclude(group: "software.amazon.awssdk", module: "apache-client")
+      exclude(group: "software.amazon.awssdk", module: "netty-nio-client")
+    }
+    implementation("software.amazon.awssdk:url-connection-client")
+    compileOnly("org.projectlombok:lombok")
+    runtimeOnly("ch.qos.logback:logback-classic")
+    runtimeOnly("com.h2database:h2")
+    testAnnotationProcessor("io.micronaut.spring:micronaut-spring-annotation")
+    developmentOnly("io.micronaut.microstream:micronaut-microstream-rest")
+    rewrite("org.openrewrite.recipe:rewrite-micronaut:1.11.0")
+    compileOnly("org.graalvm.nativeimage:svm")
+
+    implementation("io.micronaut:micronaut-validation")
+
+    testImplementation("io.micronaut:micronaut-function")
+
+    testImplementation("io.micronaut:micronaut-http-client")
+
+}
+
+
+application {
+    mainClass.set("za.co.imgn.apical.Application")
+}
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+    targetCompatibility = JavaVersion.toVersion("17")
+}
+
+graalvmNative.toolchainDetection = false
+micronaut {
+    runtime("lambda_provided")
+    testRuntime("spock2")
+    processing {
+        incremental(true)
+        annotations("za.co.imgn.apical.*")
+    }
+    aot {
+        // Please review carefully the optimizations enabled below
+        // Check https://micronaut-projects.github.io/micronaut-aot/latest/guide/ for more details
+        optimizeServiceLoading = true
+        convertYamlToJava = true
+        precomputeOperations = true
+        cacheEnvironment = true
+        optimizeClassLoading = true
+        deduceEnvironment = true
+        optimizeNetty = true
+    }
+}
+
+
+tasks.named("dockerfileNative") {
+    args(
+        "-XX:MaximumHeapSizePercent=80",
+        "-Dio.netty.allocator.numDirectArenas=0",
+        "-Dio.netty.noPreferDirect=true"
+    )
+}
+
+
+rewrite {
+    activeRecipe("org.openrewrite.java.micronaut.Micronaut2to3Migration")
+}
+
+

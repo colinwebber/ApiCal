@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: za.co.imgn.apical
+testFramework: spock
+sourceLanguage: java
+buildTool: gradle
+features: [amazon-api-gateway, annotation-api, app-name, aws-alexa, aws-cdk, aws-lambda, aws-parameter-store, aws-secrets-manager, aws-v2-sdk, data, data-jpa, dynamodb, email-sendgrid, email-template, graalvm, gradle, h2, hibernate-validator, jackson-databind, java, java-application, jdbc-hikari, jms-sqs, logback, lombok, management, micrometer, micrometer-cloudwatch, micronaut-aot, micronaut-build, microstream, microstream-rest, multi-tenancy, openapi, openrewrite, problem-json, reactor, readme, rss, security, security-annotations, security-oauth2, shade, spock, spring, swagger-ui, views-thymeleaf, yaml]
